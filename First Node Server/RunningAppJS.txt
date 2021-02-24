@@ -1,0 +1,7 @@
+To run our app whilst we are building it can become quite tedious.
+We will have to stop, start, refresh, etc... everytime we make a change to the code, or even just some html.
+Therefore, we employ the use of a package installed through 'npm', or Node Package Manager.
+The package is called Nodemon, and is useful in many ways throughout the development process. Install String: npm install nodemon (then npm install -g nodemon for global use).
+To run scripts with nodemon, you can see package.json for the list of executables.
+The most common we will run is 'nodemon start', which is currently configured to run app.js.
+The use of nodemon currently is that whenever a change in the code is detected, nodemon will automatically restart our server for us.

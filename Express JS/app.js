@@ -1,5 +1,9 @@
 // Node-Specific Modules
 const express = require('express');
+const bodyParser = require('body-parser');
+// Custom Modules
+const adminRoutes = require('./routes/admin');
+const shopRoutes = require('./routes/shop');
 
 // The majority of the logic used by express.js is exposed through this function, which we store in the const 'app'.
 const app = express()
@@ -17,25 +21,25 @@ const app = express()
 
 // app.use() can also filter urls, so that only whatever middelware we want running runs on a given response.
 // For example: this middleware will run on every URL, since '/' matches every route.
-app.use('/', (req, res, next) => {
-    console.log('This always runs!');
-    next();
-});
+// app.use('/', (req, res, next) => {
+//     next();
+// });
 
-// We can call app.use() multiple times to define more Middleware.
-// The functions get executed in order as they are given to app.
-// This middleware will only run on a specific set of URLs. Any URL that starts with /add-product/* will be caught.
-app.use('/add-product', (req, res, next) => {
-    console.log('In another middleware!');
-    // Instead of next(), we can send a response back to the browser, which ends the chain of Middleware.
-    // Express.js makes this more streamlined, by shortening it to a single line. It also allows for file transfer, but more on that later.
-    res.send('<h1>This is the "Add Product" Page.</h1>');
-});
+// To parse content, we need to register a parser with app.use.
+// Usually, we place this above all of our routing middleware.
+// The bodyParser.urlencoded function registers middleware that parses the body of the request for us.
+// It will also call 'next()' at the end, so that the request reaches our middleware as well.
+app.use(bodyParser.urlencoded({ extended: false }));
 
-// This will catch any URLs not caught by previous middleware, and send a generic response.
-app.use('/', (req, res, next) => {
-    console.log('In another middleware!');
-    res.send('<h1>Welcome from Express.js!</h1>');
+// The router object we have imported works as a valid middleware function.
+// The order of these middleware functions still matters.
+app.use(adminRoutes);
+app.use(shopRoutes);
+
+// If none of our routes resolve the request, the we end up here at the bottom of our middleware chain.
+app.use((req, res, next) => {
+    // Note here we can chain our functions together. The only requirement is that send() is last in the chain.
+    res.status(404).send('<h1>Page not found.</h1>');
 });
 
 // The 'app' function is a legitimate request handler.

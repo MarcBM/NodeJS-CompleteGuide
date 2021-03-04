@@ -1,4 +1,8 @@
+const path = require('path');
+
 const express = require('express');
+
+const rootDir = require('../util/path');
 
 // This router is a subset of 'app'. It handles routing only, and so we can re-assign much of the work we've already done to routers like this.
 const router = express.Router();
@@ -10,7 +14,8 @@ const router = express.Router();
 router.get('/add-product', (req, res, next) => {
     // Instead of next(), we can send a response back to the browser, which ends the chain of Middleware.
     // Express.js makes this more streamlined, by shortening it to a single line. It also allows for file transfer, but more on that later.
-    res.send('<form action="/product" method="POST"><input type="text" name="title"><button type="submit">Add Product</button></form>');
+    // res.send('<form action="/admin/add-product" method="POST"><input type="text" name="title"><button type="submit">Add Product</button></form>');
+    res.sendFile(path.join(rootDir, 'views', 'add-product.html'))
 });
 
 // This middleware could be above /add-product, as they have no relation to on another in the path field.
@@ -18,7 +23,8 @@ router.get('/add-product', (req, res, next) => {
 // We also only want this middleware to execute on POST requests, not any sort of requests.
 // We do this by changing the app function we use to register the middleware. app.post only accepts POST requests.
 // The non-use functions require exact path matching, not just the start of the path match.
-router.post('/product', (req, res, next) => {
+// Different router functions can take the same path as a filter, as they will only execute on the defined method.
+router.post('/add-product', (req, res, next) => {
     console.log(req.body);
     res.redirect('/');
 });

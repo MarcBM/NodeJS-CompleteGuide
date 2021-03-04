@@ -1,3 +1,5 @@
+// Core Node Modules
+const path = require('path');
 // Node-Specific Modules
 const express = require('express');
 const bodyParser = require('body-parser');
@@ -6,7 +8,7 @@ const adminRoutes = require('./routes/admin');
 const shopRoutes = require('./routes/shop');
 
 // The majority of the logic used by express.js is exposed through this function, which we store in the const 'app'.
-const app = express()
+const app = express();
 
 // Express.js works through the concept of 'Middleware'.
 // When a request is sent to the server, express passes that request through a series of functions before sending a response.
@@ -33,13 +35,16 @@ app.use(bodyParser.urlencoded({ extended: false }));
 
 // The router object we have imported works as a valid middleware function.
 // The order of these middleware functions still matters.
-app.use(adminRoutes);
+// If we group our URLs (eg. all the admin URLs start with '/admin'), then we can define that filter at this level.
+// This way, we don't need to worry about it inside adminRoutes.
+app.use('/admin', adminRoutes);
 app.use(shopRoutes);
 
 // If none of our routes resolve the request, the we end up here at the bottom of our middleware chain.
 app.use((req, res, next) => {
     // Note here we can chain our functions together. The only requirement is that send() is last in the chain.
-    res.status(404).send('<h1>Page not found.</h1>');
+    // res.status(404).send('<h1>Page not found.</h1>');
+    res.status(404).sendFile(path.join(__dirname, 'views', '404.html'));
 });
 
 // The 'app' function is a legitimate request handler.

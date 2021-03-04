@@ -32,6 +32,9 @@ const app = express();
 // The bodyParser.urlencoded function registers middleware that parses the body of the request for us.
 // It will also call 'next()' at the end, so that the request reaches our middleware as well.
 app.use(bodyParser.urlencoded({ extended: false }));
+// If we want to expose read-access to a file directory, for CSS or JS use in the browser, we must declare it here.
+// The express object has a static method which provides this access to a directory in the file system.
+app.use(express.static(path.join(__dirname, 'public')));
 
 // The router object we have imported works as a valid middleware function.
 // The order of these middleware functions still matters.

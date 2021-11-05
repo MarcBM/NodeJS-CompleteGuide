@@ -2,28 +2,14 @@
 const path = require('path');
 // Node-Specific Modules
 const express = require('express');
-// Custom Utility Modules
-const rootDir = require('../util/path');
+// Custom Controller Modules
+const productsController = require('../controllers/products')
 
 const router = express.Router();
 
-const products = [];
+// When retrieving a function from a controller, we are just storing a reference, not a call.
+router.get('/add-product', productsController.getAddProduct);
 
-router.get('/add-product', (req, res, next) => {
-    res.render('add-product', {
-        docTitle: "Add Product",
-        path: '/admin/add-product',
-        formsCSS: true,
-        productCSS: true,
-        activeAddProduct: true
-    })
-});
+router.post('/add-product', productsController.postAddProduct);
 
-router.post('/add-product', (req, res, next) => {
-    // Here we save the product to our array.
-    products.push({title: req.body.title});
-    res.redirect('/');
-});
-
-exports.routes = router;
-exports.products = products;
+module.exports = router;

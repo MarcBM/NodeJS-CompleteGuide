@@ -1,0 +1,12 @@
+The MVC Pattern is a way of designing a project such that our application is split into logical sections.
+Each section of the application should be separated by the concerns that it has.
+Models:
+    The Models in an application are the parts that deal with data.
+    They represent data in our code, as well as help us work with the data.
+Views:
+    The Views are what the user will see, and they should be detatched from our app code.
+Controllers:
+    Controllers connect the Models to the Views.
+    This allows the app to interact with the data, but adds a layer of separation between user and data.
+    The Controllers contain our 'in-between' logic.
+    Routes are an example of part of our Controllers.

@@ -8,6 +8,7 @@
 // Core Node Modules.
 const fs = require('fs');
 const path = require('path');
+const { threadId } = require('worker_threads');
 
 const p = path.join(
     path.dirname(process.mainModule.filename),
@@ -34,6 +35,7 @@ module.exports = class Product {
     }
 
     save() {
+        this.id = Math.random().toString();
         getProductsFromFile(products => {
             products.push(this);
             fs.writeFile(p, JSON.stringify(products), err => {

@@ -6,7 +6,7 @@ const Product = require('../models/product');
 
 // Get AddProduct - Used in admin.js.
 exports.getAddProduct = (req, res, next) => {
-    res.render('add-product', {
+    res.render('admin/add-product', {
         docTitle: "Add Product",
         path: '/admin/add-product',
         formsCSS: true,
@@ -26,7 +26,7 @@ exports.postAddProduct = (req, res, next) => {
 // Get Products data - Used in shop.js.
 exports.getProducts = (req, res, next) => {
     const products = Product.fetchAll(products => {
-        res.render('shop', {
+        res.render('shop/product-list', {
             prods: products,
             docTitle: 'Shop',
             path: '/',

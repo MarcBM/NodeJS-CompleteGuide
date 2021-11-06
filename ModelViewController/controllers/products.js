@@ -25,13 +25,14 @@ exports.postAddProduct = (req, res, next) => {
 
 // Get Products data - Used in shop.js.
 exports.getProducts = (req, res, next) => {
-    const products = Product.fetchAll();
-    res.render('shop', {
-        prods: products,
-        docTitle: 'Shop',
-        path: '/',
-        hasProducts: products.length > 0,
-        activeShop: true,
-        productCSS: true
+    const products = Product.fetchAll(products => {
+        res.render('shop', {
+            prods: products,
+            docTitle: 'Shop',
+            path: '/',
+            hasProducts: products.length > 0,
+            activeShop: true,
+            productCSS: true
+        });
     });
 };

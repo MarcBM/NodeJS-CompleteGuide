@@ -52,7 +52,7 @@ module.exports = class Product {
         getProductsFromFile(products => {
             // Sneaky tiny arrow function magics... One liner has implicit return statement.
             const product = products.find(p => p.id === id);
-            cb(products);
+            cb(product);
         });
     }
 };

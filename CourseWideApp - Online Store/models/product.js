@@ -47,4 +47,12 @@ module.exports = class Product {
     static fetchAll(cb) {
         getProductsFromFile(cb);
     }
-}
+
+    static findById(id, cb) {
+        getProductsFromFile(products => {
+            // Sneaky tiny arrow function magics... One liner has implicit return statement.
+            const product = products.find(p => p.id === id);
+            cb(products);
+        });
+    }
+};

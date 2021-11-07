@@ -11,6 +11,9 @@ router.get('/', shopController.getIndex);
 
 router.get('/products', shopController.getProducts);
 
+// Adding a colon here allows us to tell expressJS to look for a dynamic route.
+router.get('/products/:productId', shopController.getProduct);
+
 router.get('/cart', shopController.getCart);
 
 router.get('/orders', shopController.getOrders);

@@ -54,6 +54,18 @@ module.exports = class Product {
         });
     }
 
+    static deleteById(id) {
+        getProductsFromFile(products => {
+            // Neat filter function only returns elements that return true.
+            const updatedProducts = products.filter(prod => prod.id !== id);
+            fs.writeFile(p, JSON.stringify(updatedProducts), err => {
+                if (!err) {
+                    
+                }
+            })
+        });
+    }
+
     static fetchAll(cb) {
         getProductsFromFile(cb);
     }

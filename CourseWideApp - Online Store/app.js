@@ -8,6 +8,8 @@ const adminRoutes = require('./routes/admin');
 const shopRoutes = require('./routes/shop');
 // Custom Controller Modules
 const errorController = require('./controllers/error');
+// Custom Database Module
+const db = require('./util/database');
 
 const app = express();
 

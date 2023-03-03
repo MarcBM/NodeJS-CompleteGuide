@@ -1,41 +1,27 @@
-// This file will model a single 'product' entity.
-// This is where our OO Programming works.
+const Sequelize = require('sequelize');
 
-// We used to use an array to store all of our products, but it is much better to use a file instead.
-// Eventually, we will implement a proper database to house all of the data, but for now a file will do.
-// const products = [];
+const sequelize = require('../util/database');
 
-// Core Node Modules.
-
-const db = require('../util/database');
-
-const Cart = require('./cart');
-
-module.exports = class Product {
-    constructor(id, title, imageUrl, description, price) {
-        this.id = id;
-        this.title = title;
-        this.imageUrl = imageUrl;
-        this.description = description;
-        this.price = price;
+const Product = sequelize.define('product', {
+    id: {
+        type: Sequelize.INTEGER,
+        autoIncrement: true,
+        allowNull: false,
+        primaryKey: true
+    },
+    title: Sequelize.STRING,
+    price: {
+        type: Sequelize.DOUBLE,
+        allowNull: false
+    },
+    imageUrl: {
+        type: Sequelize.STRING,
+        allowNull: false
+    },
+    description: {
+        type: Sequelize.STRING,
+        allowNull: false
     }
+});
 
-    save() {
-        return db.execute(
-            'INSERT INTO products (title, price, imageUrl, description) VALUES (?, ?, ?, ?)',
-            [this.title, this.price, this.imageUrl, this.description]
-        );
-    }
-
-    static deleteById(id) {
-        
-    }
-
-    static fetchAll() {
-        return db.execute('SELECT * FROM products');
-    }
-
-    static findById(id) {
-        return db.execute('SELECT * FROM products WHERE products.id = ?', [id]);
-    }
-};
+module.exports = Product;

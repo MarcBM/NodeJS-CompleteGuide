@@ -26,7 +26,8 @@ app.use(errorController.get404);
 
 // Command to sync all defined models in the app with the MySQL database.
 // Sequelize creates/updates any new/changed definitions into tables.
-sequelize.sync().then(result => {
+sequelize.sync()
+.then(result => {
     // console.log(result)
 })
 .catch(err => {

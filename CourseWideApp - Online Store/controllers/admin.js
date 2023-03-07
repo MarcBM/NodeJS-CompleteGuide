@@ -16,12 +16,22 @@ exports.postAddProduct = (req, res, next) => {
     const imageUrl = req.body.imageUrl;
     const description = req.body.description;
     const price = req.body.price;
-    const product = new Product(null, title, imageUrl, description, price);
-    product.save()
-        .then(() => {
-            res.redirect('/');
+    // The .create() method is provided by Sequelize allowing us to instantiate an object following the pattern
+    // outlined in the model. It also posts it to the associated table in the db. You can use .build() instead
+    // if you wish to split these two steps up.
+    Product.create({
+        title: title,
+        price: price,
+        imageUrl: imageUrl,
+        description: description
+    })
+        .then(result => {
+            // console.log(result);
+            console.log('Created Product!');
         })
-        .catch(err => console.log(err));
+        .catch(err => {
+            console.log(err);
+        });
 };
 
 exports.getEditProduct = (req, res, next) => {
@@ -61,13 +71,17 @@ exports.postEditProduct = (req, res, next) => {
 };
 
 exports.getProducts = (req, res, next) => {
-    const products = Product.fetchAll(products => {
-        res.render('admin/products', {
-            prods: products,
-            pageTitle: 'Admin Products',
-            path: '/admin/products'
+    Product.findAll()
+        .then(products => {
+            res.render('admin/products', {
+                prods: products,
+                pageTitle: 'Admin Products',
+                path: '/admin/products'
+            });
+        })
+        .catch(err => {
+            console.log(err);
         });
-    });
 }
 
 exports.postDeleteProduct = (req, res, next) => {

@@ -28,19 +28,22 @@ exports.postAddProduct = (req, res, next) => {
         .then(result => {
             // console.log(result);
             console.log('Created Product!');
+            res.redirect('/admin/products');
         })
         .catch(err => {
             console.log(err);
         });
 };
 
+// Get EditProduct - Used in routes/admin.js.
+// This used the same sequelize syntax as getProduct() in controllers/shop.js.
 exports.getEditProduct = (req, res, next) => {
     const editMode = req.query.edit;
     if (!editMode) {
         return res.redirect('/');
     }
     const prodId = req.params.productId;
-    Product.findById(prodId, product => {
+    Product.findByPk(prodId).then(product => {
         if (!product) {
             return res.redirect('/');
         }
@@ -50,7 +53,8 @@ exports.getEditProduct = (req, res, next) => {
             editing: editMode,
             product: product
         });
-    });
+    })
+    .catch(err => console.log(err));
 };
 
 exports.postEditProduct = (req, res, next) => {
@@ -59,15 +63,24 @@ exports.postEditProduct = (req, res, next) => {
     const updatedImageUrl = req.body.imageUrl;
     const updatedDescription = req.body.description;
     const updatedPrice = req.body.price;
-    const updatedProduct = new Product(
-        prodId,
-        updatedTitle,
-        updatedImageUrl,
-        updatedDescription,
-        updatedPrice
-    );
-    updatedProduct.save();
-    res.redirect('/admin/products');
+    // We first need to find the product in the database by its id.
+    Product.findByPk(prodId)
+    // We then update the product with the new values. Note that this will only change local values at this stage, not the database values.
+        .then(product => {
+            product.title = updatedTitle;
+            product.imageUrl = updatedImageUrl;
+            product.description = updatedDescription;
+            product.price = updatedPrice;
+            // To save the updated product, we call save() on the product object.
+            // To avoid nesting promises, we return the product.save() promise, and append another .then to our current tree.
+            return product.save()
+        })
+        .then(result => {
+            console.log('Updated Product!');
+            // The page redirection is placed inside the then() block to make sure the page renders with the new values. This does mean that we are not doing any redirection if an error occurs, but we will look at that in a future module of the course.
+            res.redirect('/admin/products');
+        })
+        .catch(err => confirmor.log(err));
 };
 
 exports.getProducts = (req, res, next) => {
@@ -84,8 +97,16 @@ exports.getProducts = (req, res, next) => {
         });
 }
 
+// This method will use similar syntax to the postEditProduct() method above.
 exports.postDeleteProduct = (req, res, next) => {
     const prodId = req.body.productId;
-    Product.deleteById(prodId);
-    res.redirect('/admin/products');
+    Product.findByPk(prodId)
+        .then(product => {
+            return product.destroy();
+        })
+        .then(result => {
+            console.log('Deleted Product!');
+            res.redirect('/admin/products');
+        })
+        .catch(err => console.log(err));
 }

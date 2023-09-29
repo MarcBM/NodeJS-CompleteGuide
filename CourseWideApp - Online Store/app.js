@@ -29,9 +29,9 @@ app.use(errorController.get404);
 sequelize.sync()
 .then(result => {
     // console.log(result)
+    // We only want to start the server if the database syncs successfully.
+    app.listen(3000);
 })
 .catch(err => {
     console.log(err);
 });
-
-app.listen(3000);

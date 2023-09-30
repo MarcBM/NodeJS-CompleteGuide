@@ -77,6 +77,10 @@ sequelize
     })
     .then(user => {
         // console.log(user);
+        // To have the cart function we must create one for the user once the user has been created.
+        return user.createCart();
+    })
+    .then(cart => {
         // We only want to start the server if the database syncs successfully.
         app.listen(3000);
     })

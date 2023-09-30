@@ -54,18 +54,23 @@ exports.getEditProduct = (req, res, next) => {
         return res.redirect('/');
     }
     const prodId = req.params.productId;
-    Product.findByPk(prodId).then(product => {
-        if (!product) {
-            return res.redirect('/');
-        }
-        res.render('admin/edit-product', {
-            pageTitle: "Edit Product",
-            path: '/admin/edit-product',
-            editing: editMode,
-            product: product
-        });
-    })
-    .catch(err => console.log(err));
+    // A similar relational method can be used to find products based on their association to a user.
+    req.user
+        .getProducts({where: {id: prodId}})
+    // Product.findByPk(prodId)
+        .then(products => {
+            const product = products[0];
+            if (!product) {
+                return res.redirect('/');
+            }
+            res.render('admin/edit-product', {
+                pageTitle: "Edit Product",
+                path: '/admin/edit-product',
+                editing: editMode,
+                product: product
+            });
+        })
+        .catch(err => console.log(err));
 };
 
 exports.postEditProduct = (req, res, next) => {
@@ -94,8 +99,11 @@ exports.postEditProduct = (req, res, next) => {
         .catch(err => confirmor.log(err));
 };
 
+// Instead of finding all products, we can just find all products associated with a user.
 exports.getProducts = (req, res, next) => {
-    Product.findAll()
+    // Product.findAll()
+    req.user
+        .getProducts()
         .then(products => {
             res.render('admin/products', {
                 prods: products,

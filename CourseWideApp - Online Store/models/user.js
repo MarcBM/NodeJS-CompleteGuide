@@ -1,0 +1,22 @@
+// This model will be very basic to start with, as there is no authentication so far.
+const Sequelize = require('sequelize');
+const sequelize = require('../util/database');
+
+const User = sequelize.define('user', {
+    id: {
+        type: Sequelize.INTEGER,
+        primaryKey: true,
+        autoIncrement: true,
+        allowNull: false
+    },
+    name: {
+        type: Sequelize.STRING,
+        allowNull: false
+    },
+    email: {
+        type: Sequelize.STRING,
+        allowNull: false
+    }
+});
+
+module.exports = User;

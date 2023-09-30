@@ -29,6 +29,8 @@ app.use((req, res, next) => {
         .then(user => {
             // By adding the user to the request object, we can access the user at any point in the app. We are able to do this since 'user' is not a pre-defined field of the request object.
             req.user = user;
+            // Don't forget to call the next middleware function!
+            next();
         })
         .catch(err => console.log(err));
 });

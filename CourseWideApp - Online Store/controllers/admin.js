@@ -19,12 +19,23 @@ exports.postAddProduct = (req, res, next) => {
     // The .create() method is provided by Sequelize allowing us to instantiate an object following the pattern
     // outlined in the model. It also posts it to the associated table in the db. You can use .build() instead
     // if you wish to split these two steps up.
-    Product.create({
-        title: title,
-        price: price,
-        imageUrl: imageUrl,
-        description: description
-    })
+    
+    // Since we want a product connected to a user, we can use the user object to create the product instead.
+    req.user
+        .createProduct({
+            title: title,
+            price: price,
+            imageUrl: imageUrl,
+            description: description
+        })
+    // Product.create({
+    //     title: title,
+    //     price: price,
+    //     imageUrl: imageUrl,
+    //     description: description,
+    //     Instead of adding the user id manually, we can instead have the user object itself create the product, since sequelize has given us a new function to use once the relationship was established.
+    //     userId: req.user.id
+    // })
         .then(result => {
             // console.log(result);
             console.log('Created Product!');

@@ -15,6 +15,8 @@ const Product = require('./models/product');
 const User = require('./models/user');
 const Cart = require('./models/cart');
 const CartItem = require('./models/cart-item');
+const Order = require('./models/order');
+const OrderItem = require('./models/order-item');
 
 const app = express();
 
@@ -50,7 +52,9 @@ Cart.belongsTo(User);
 // This belongs to many relationship is made possible through the intermediary table of CartItems. Sequelize will set up this relationship automatically using columns on the CartItem table.
 Cart.belongsToMany(Product, {through: CartItem});
 Product.belongsToMany(Cart, {through: CartItem});
-
+Order.belongsTo(User);
+User.hasMany(Order);
+Order.belongsToMany(Product, {through: OrderItem});
 
 // Command to sync all defined models in the app with the MySQL database.
 // Sequelize creates/updates any new/changed definitions into tables.

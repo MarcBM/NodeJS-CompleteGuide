@@ -16,26 +16,11 @@ exports.postAddProduct = (req, res, next) => {
     const imageUrl = req.body.imageUrl;
     const description = req.body.description;
     const price = req.body.price;
-    // The .create() method is provided by Sequelize allowing us to instantiate an object following the pattern
-    // outlined in the model. It also posts it to the associated table in the db. You can use .build() instead
-    // if you wish to split these two steps up.
-    
-    // Since we want a product connected to a user, we can use the user object to create the product instead.
-    req.user
-        .createProduct({
-            title: title,
-            price: price,
-            imageUrl: imageUrl,
-            description: description
-        })
-    // Product.create({
-    //     title: title,
-    //     price: price,
-    //     imageUrl: imageUrl,
-    //     description: description,
-    //     Instead of adding the user id manually, we can instead have the user object itself create the product, since sequelize has given us a new function to use once the relationship was established.
-    //     userId: req.user.id
-    // })
+    // Using MongoDB, we are back to instantiating a new product object.
+    const product = new Product(title, price, description, imageUrl);
+    // Now we can just call the save() method on the product object.
+    product
+        .save()
         .then(result => {
             // console.log(result);
             console.log('Created Product!');

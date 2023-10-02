@@ -4,12 +4,12 @@ const path = require('path');
 const express = require('express');
 const bodyParser = require('body-parser');
 // Custom Routes Modules
-// const adminRoutes = require('./routes/admin');
+const adminRoutes = require('./routes/admin');
 // const shopRoutes = require('./routes/shop');
 // Custom Controller Modules
 const errorController = require('./controllers/error');
 // Custom Database Module
-const mongoConnect = require('./util/database');
+const mongoConnect = require('./util/database').mongoConnect;
 
 const app = express();
 
@@ -30,15 +30,15 @@ app.use((req, res, next) => {
     //         next();
     //     })
     //     .catch(err => console.log(err));
+    next();
 });
 
-// app.use('/admin', adminRoutes);
+app.use('/admin', adminRoutes);
 // app.use(shopRoutes);
 
 app.use(errorController.get404);
 
 // Since we are migrating over to MongoDB, all old DB code is getting deleted.
-mongoConnect(client => {
-    console.log(client);
+mongoConnect(() => {
     app.listen(3000);
 });

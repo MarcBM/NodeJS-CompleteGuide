@@ -1,35 +1,26 @@
-// As we are creating a SQL model, we need to import the Sequelize library.
-const Sequelize = require('sequelize');
-// We need to create a connection to the database.
-const sequelize = require('../util/database');
-// This is the definition of the model. In this case, we are creating a table to model products.
-const Product = sequelize.define('product', {
-    // Each element of the model represents a column in the database.
-    // In this case, we are creating an id, title, price, image url, and description.
-    id: {
-        // Each element must have a type, but this is the only required field.
-        type: Sequelize.INTEGER,
-        // The auto-increment option defaults to false, but when enabled will set the first row to 1, and then increment by 1 afterwards, ensuring that each id is unique.
-        autoIncrement: true,
-        // We want to ensure that each row contains an id, so we do not allow null values.
-        allowNull: false,
-        // Each table in SQL must have a primary key, and in this case, the ID field is used as it will be unique, and used to search the database.
-        primaryKey: true
-    },
-    // If you only want to set a type for a column, you can use the following syntax.
-    title: Sequelize.STRING,
-    price: {
-        type: Sequelize.DOUBLE,
-        allowNull: false
-    },
-    imageUrl: {
-        type: Sequelize.STRING,
-        allowNull: false
-    },
-    description: {
-        type: Sequelize.STRING,
-        allowNull: false
+// So that we can save our objects to the database, we need the connection to the database.
+const getDB = require('../util/database').getDB;
+
+// Since MongoDB uses a data format similar to JSON, we can simply create standard JavaScript objects which will be serialized by MongoDB.
+class Product {
+    constructor(title, price, description, imageUrl) {
+        this.title = title;
+        this.price = price;
+        this.description = description;
+        this.imageUrl = imageUrl;
     }
-});
+
+    // This method is used to save the object to the database.
+    save() {
+        const db = getDB();
+        // Here we instruct MongoDB to access a collection. These collections do not need to be created ahead of time, if they do not exist, they will be created.
+        // The insertOne method allows us to insert an object into the collection. This method also returns a promise.
+        // We return this whole thing since this will be used in the controller as part of a promise chain.
+        return db.collection('products')
+            .insertOne(this)
+            .then(result => console.log(result))
+            .catch(err => console.log(err));
+    }
+}
 
 module.exports = Product;

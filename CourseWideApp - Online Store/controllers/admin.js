@@ -21,8 +21,7 @@ exports.postAddProduct = (req, res, next) => {
     // Now we can just call the save() method on the product object.
     product
         .save()
-        .then(result => {
-            // console.log(result);
+        .then(() => {
             console.log('Created Product!');
             res.redirect('/admin/products');
         })
@@ -32,19 +31,14 @@ exports.postAddProduct = (req, res, next) => {
 };
 
 // Get EditProduct - Used in routes/admin.js.
-// This used the same sequelize syntax as getProduct() in controllers/shop.js.
 exports.getEditProduct = (req, res, next) => {
     const editMode = req.query.edit;
     if (!editMode) {
         return res.redirect('/');
     }
     const prodId = req.params.productId;
-    // A similar relational method can be used to find products based on their association to a user.
-    req.user
-        .getProducts({where: {id: prodId}})
-    // Product.findByPk(prodId)
-        .then(products => {
-            const product = products[0];
+    Product.findById(prodId)
+        .then(product => {
             if (!product) {
                 return res.redirect('/');
             }
@@ -64,31 +58,33 @@ exports.postEditProduct = (req, res, next) => {
     const updatedImageUrl = req.body.imageUrl;
     const updatedDescription = req.body.description;
     const updatedPrice = req.body.price;
+
+    // We no longer need to find the product in the database by its ID, since we have all the data we need to recreate it, and use our product model method to save the updated product to the same place in the database.
+    // ======================================================================================
+    // This is important to internalise, since the db call is never going to actually give us a functional product model object as we have defined. All the db stores is the data within that model, not any methods, so when it returns it to us, all we get is a JSON object represtation of the product data.
+    // ======================================================================================
+    const product = new Product(
+        updatedTitle,
+        updatedPrice,
+        updatedDescription,
+        updatedImageUrl,
+        prodId
+    );
+
+    // Now we can just call save() on our new product object. Since it already has an id, the save method will update the existing document, rather than creating a new one.
     // We first need to find the product in the database by its id.
-    Product.findByPk(prodId)
-    // We then update the product with the new values. Note that this will only change local values at this stage, not the database values.
-        .then(product => {
-            product.title = updatedTitle;
-            product.imageUrl = updatedImageUrl;
-            product.description = updatedDescription;
-            product.price = updatedPrice;
-            // To save the updated product, we call save() on the product object.
-            // To avoid nesting promises, we return the product.save() promise, and append another .then to our current tree.
-            return product.save()
-        })
-        .then(result => {
+    product
+        .save()
+        .then(() => {
             console.log('Updated Product!');
             // The page redirection is placed inside the then() block to make sure the page renders with the new values. This does mean that we are not doing any redirection if an error occurs, but we will look at that in a future module of the course.
             res.redirect('/admin/products');
         })
-        .catch(err => confirmor.log(err));
+        .catch(err => console.log(err));
 };
 
-// Instead of finding all products, we can just find all products associated with a user.
 exports.getProducts = (req, res, next) => {
-    // Product.findAll()
-    req.user
-        .getProducts()
+    Product.fetchAll()
         .then(products => {
             res.render('admin/products', {
                 prods: products,
@@ -101,15 +97,11 @@ exports.getProducts = (req, res, next) => {
         });
 }
 
-// This method will use similar syntax to the postEditProduct() method above.
+// This method is mostly implemented within the product model itself.
 exports.postDeleteProduct = (req, res, next) => {
     const prodId = req.body.productId;
-    Product.findByPk(prodId)
-        .then(product => {
-            return product.destroy();
-        })
-        .then(result => {
-            console.log('Deleted Product!');
+    Product.deleteById(prodId)
+        .then(() => {
             res.redirect('/admin/products');
         })
         .catch(err => console.log(err));

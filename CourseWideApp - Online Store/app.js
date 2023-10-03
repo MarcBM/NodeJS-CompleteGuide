@@ -5,7 +5,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 // Custom Routes Modules
 const adminRoutes = require('./routes/admin');
-// const shopRoutes = require('./routes/shop');
+const shopRoutes = require('./routes/shop');
 // Custom Controller Modules
 const errorController = require('./controllers/error');
 // Custom Database Module
@@ -34,7 +34,7 @@ app.use((req, res, next) => {
 });
 
 app.use('/admin', adminRoutes);
-// app.use(shopRoutes);
+app.use(shopRoutes);
 
 app.use(errorController.get404);
 

@@ -17,7 +17,7 @@ exports.postAddProduct = (req, res, next) => {
     const description = req.body.description;
     const price = req.body.price;
     // Using MongoDB, we are back to instantiating a new product object.
-    const product = new Product(title, price, description, imageUrl);
+    const product = new Product(title, price, description, imageUrl, null, req.user._id);
     // Now we can just call the save() method on the product object.
     product
         .save()

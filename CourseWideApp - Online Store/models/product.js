@@ -4,12 +4,13 @@ const mongodb = require('mongodb');
 
 // Since MongoDB uses a data format similar to JSON, we can simply create standard JavaScript objects which will be serialized by MongoDB.
 class Product {
-    constructor(title, price, description, imageUrl, id) {
+    constructor(title, price, description, imageUrl, id, userId) {
         this.title = title;
         this.price = price;
         this.description = description;
         this.imageUrl = imageUrl;
         this._id = id ? new mongodb.ObjectId(id) : null;
+        this.userId = userId;
     }
 
     // This method is used to save the object to the database.

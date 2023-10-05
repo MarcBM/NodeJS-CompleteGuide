@@ -1,13 +1,13 @@
-// Here in the 'shop' controller, we are going to place all of the logic that deals with the shop.
-// All this logic already existed inside the routes files, but to avoid bloating them too much,
-// we can place the logic here instead.
+// Here in the 'shop' controller, we are going to place all of the logic that deals with the shop. All this logic already existed inside the routes files, but to avoid bloating them too much, we can place the logic here instead.
 
 const Product = require('../models/product');
 
 // Get Products data - Used in routes/shop.js.
 exports.getProducts = (req, res, next) => {
-	Product.fetchAll()
+	// Mongoose doesn't provide us with a fetchAll method, but it does expose the find method we are already familiar with. Instead of returning a cursor, it instead returns the entire array. If the data set is too large for this, you can use the .cursor() method to go back to getting the cursor.
+	Product.find()
 		.then((products) => {
+			// console.log(products);
 			res.render('shop/product-list', {
 				prods: products,
 				pageTitle: 'All Products',
@@ -21,7 +21,7 @@ exports.getProducts = (req, res, next) => {
 
 exports.getProduct = (req, res, next) => {
 	const prodId = req.params.productId;
-	// The findById method is defined in the product model.
+	// The findById method is provided by Mongoose, and even better, we don't need to mess about with the gross MongoDB Object ID object conversions. Therefore, our code should work as expected with no changes!
 	Product.findById(prodId)
 		.then((product) => {
 			res.render('shop/product-detail', {
@@ -34,7 +34,7 @@ exports.getProduct = (req, res, next) => {
 };
 
 exports.getIndex = (req, res, next) => {
-	Product.fetchAll()
+	Product.find()
 		.then((products) => {
 			res.render('shop/index', {
 				prods: products,

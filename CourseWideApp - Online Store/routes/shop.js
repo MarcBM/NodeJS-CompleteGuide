@@ -3,7 +3,7 @@ const path = require('path');
 // Node-Specific Modules
 const express = require('express');
 // Custom Controller Modules
-const shopController = require('../controllers/shop')
+const shopController = require('../controllers/shop');
 
 const router = express.Router();
 

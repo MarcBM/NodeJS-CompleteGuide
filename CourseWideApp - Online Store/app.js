@@ -24,7 +24,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 // We are registering another middleware function that will allow us to access our user at any point in the app.
 app.use((req, res, next) => {
 	// We can find the user here since we know that there will always be a user once a request comes into the server.
-	User.findById('651e5fcf48a4f75f82ac5200')
+	User.findById('651e8341a9a7b8901aed0451')
 		.then((user) => {
 			// By adding the user to the request object, we can access the user at any point in the app. We are able to do this since 'user' is not a pre-defined field of the request object.
 			// We can once again simply add the object that mongoose returns, since it is a fully fledged object that we can interact with.

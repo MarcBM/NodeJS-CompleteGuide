@@ -1,8 +1,8 @@
 // NOTE: See the product model for more information on uncommented methods here.
 
 // So that we can save our objects to the database, we need the connection to the database.
-const getDB = require("../util/database").getDB;
-const mongodb = require("mongodb");
+const getDB = require('../util/database').getDB;
+const mongodb = require('mongodb');
 
 // Still no authentication, so we are just using a simple user model.
 class User {
@@ -19,10 +19,10 @@ class User {
 		let dbOperation;
 		if (this._id) {
 			dbOperation = db
-				.collection("users")
+				.collection('users')
 				.updateOne({ _id: this._id }, { $set: this });
 		} else {
-			dbOperation = db.collection("users").insertOne(this);
+			dbOperation = db.collection('users').insertOne(this);
 		}
 		return dbOperation.then().catch((err) => console.log(err));
 	}
@@ -57,7 +57,7 @@ class User {
 		const db = getDB();
 		// We are doing the same thing as save(), but I guess for best practice we don't want to expose the whole user to being updated, which could potentially be get slow.
 		return db
-			.collection("users")
+			.collection('users')
 			.updateOne({ _id: this._id }, { $set: { cart: updatedCart } })
 			.then()
 			.catch((err) => console.log(err));
@@ -72,7 +72,7 @@ class User {
 		// This find() query operation $in will return a cursor pointing to each item that matches a product id in the provided array. We can simply use the toArray() method to convert all these cursors into an array, since we know there won't be too many to handle at once.
 		return (
 			db
-				.collection("products")
+				.collection('products')
 				.find({ _id: { $in: productIds } })
 				.toArray()
 				// We also need to collect the quantities of each product in the cart.
@@ -102,18 +102,56 @@ class User {
 
 		const db = getDB();
 		return db
-			.collection("users")
+			.collection('users')
 			.updateOne(
 				{ _id: this._id },
 				{ $set: { cart: { items: updatedCartItems } } }
 			);
 	}
 
+	// While we are creating orders here, we are going to store them in their own collection on the database, to avoid having too much data embedded on the user.
+	addOrder() {
+		const db = getDB();
+		// Inside the order, we want to store all the product data *at the time of the order*, which means we want to create duplicate data here. Usually, this is a negative, since we would have to update the data whenever it changes, but in this case, we actually want to see old data on orders.
+		// We already have a method that gets all the products in the cart, so we can just use that.
+		return (
+			this.getCart()
+				.then((products) => {
+					const order = {
+						items: products,
+						// We also want to store information about the user, and how much of that we store is up to us. We definitely nee a reference to the user, but we may also want quick access to some other information as well.
+						user: {
+							_id: new mongodb.ObjectId(this._id),
+							name: this.name
+						}
+					};
+					return db.collection('orders').insertOne(order);
+				})
+				// Once the order has been placed, we need to remove all items from the cart, and also make that update on the database.
+				.then((result) => {
+					this.cart = { items: [] };
+					return db
+						.collection('users')
+						.updateOne({ _id: this._id }, { $set: { cart: { items: [] } } });
+				})
+				.catch((err) => console.log(err))
+		);
+	}
+
+	// This method will be used to find all orders associated with this user.
+	getOrders() {
+		const db = getDB();
+		return db
+			.collection('orders')
+			.find({ 'user._id': new mongodb.ObjectId(this._id) })
+			.toArray()
+			.catch((err) => console.log(err));
+	}
+
 	static findById(userId) {
 		const db = getDB();
-
 		return db
-			.collection("users")
+			.collection('users')
 			.find({ _id: new mongodb.ObjectId(userId) })
 			.next()
 			.then((user) => {

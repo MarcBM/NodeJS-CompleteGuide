@@ -2,16 +2,16 @@
 // All this logic already existed inside the routes files, but to avoid bloating them too much,
 // we can place the logic here instead.
 
-const Product = require("../models/product");
+const Product = require('../models/product');
 
 // Get Products data - Used in routes/shop.js.
 exports.getProducts = (req, res, next) => {
 	Product.fetchAll()
 		.then((products) => {
-			res.render("shop/product-list", {
+			res.render('shop/product-list', {
 				prods: products,
-				pageTitle: "All Products",
-				path: "/products"
+				pageTitle: 'All Products',
+				path: '/products'
 			});
 		})
 		.catch((err) => {
@@ -24,10 +24,10 @@ exports.getProduct = (req, res, next) => {
 	// The findById method is defined in the product model.
 	Product.findById(prodId)
 		.then((product) => {
-			res.render("shop/product-detail", {
+			res.render('shop/product-detail', {
 				product: product,
 				pageTitle: product.title,
-				path: "/products"
+				path: '/products'
 			});
 		})
 		.catch((err) => console.log(err));
@@ -36,10 +36,10 @@ exports.getProduct = (req, res, next) => {
 exports.getIndex = (req, res, next) => {
 	Product.fetchAll()
 		.then((products) => {
-			res.render("shop/index", {
+			res.render('shop/index', {
 				prods: products,
-				pageTitle: "Shop",
-				path: "/"
+				pageTitle: 'Shop',
+				path: '/'
 			});
 		})
 		.catch((err) => {
@@ -51,9 +51,9 @@ exports.getCart = (req, res, next) => {
 	req.user
 		.getCart()
 		.then((products) => {
-			res.render("shop/cart", {
-				path: "/cart",
-				pageTitle: "Your Cart",
+			res.render('shop/cart', {
+				path: '/cart',
+				pageTitle: 'Your Cart',
 				products: products
 			});
 		})
@@ -70,7 +70,7 @@ exports.postCart = (req, res, next) => {
 			return req.user.addToCart(product);
 		})
 		.then((result) => {
-			res.redirect("/cart");
+			res.redirect('/cart');
 		})
 		.catch((err) => console.log(err));
 };
@@ -81,49 +81,27 @@ exports.postCartDeleteProduct = (req, res, next) => {
 	req.user
 		.deleteItemFromCart(prodId)
 		.then((result) => {
-			res.redirect("/cart");
+			res.redirect('/cart');
 		})
 		.catch((err) => console.log(err));
 };
 
 exports.postOrder = (req, res, next) => {
-	let fetchedCart;
 	req.user
-		.getCart()
-		.then((cart) => {
-			fetchedCart = cart;
-			return cart.getProducts();
-		})
-		.then((products) => {
-			// console.log(products);
-			return req.user
-				.createOrder()
-				.then((order) => {
-					return order.addProducts(
-						products.map((product) => {
-							product.orderItem = { quantity: product.cartItem.quantity };
-							return product;
-						})
-					);
-				})
-				.catch((err) => console.log(err));
-		})
+		.addOrder()
 		.then((result) => {
-			return fetchedCart.setProducts(null);
-		})
-		.then((result) => {
-			res.redirect("/orders");
+			res.redirect('/orders');
 		})
 		.catch((err) => console.log(err));
 };
 
 exports.getOrders = (req, res, next) => {
 	req.user
-		.getOrders({ include: ["products"] })
+		.getOrders()
 		.then((orders) => {
-			res.render("shop/orders", {
-				path: "/orders",
-				pageTitle: "Your Orders",
+			res.render('shop/orders', {
+				path: '/orders',
+				pageTitle: 'Your Orders',
 				orders: orders
 			});
 		})

@@ -31,11 +31,11 @@ exports.postAddProduct = (req, res, next) => {
 	product
 		// The save() method will save this product to the database, and was predefined by mongoose.
 		.save()
-		.then((result) => {
+		.then(result => {
 			console.log('Created Product!');
 			res.redirect('/admin/products');
 		})
-		.catch((err) => {
+		.catch(err => {
 			console.log(err);
 		});
 };
@@ -48,7 +48,7 @@ exports.getEditProduct = (req, res, next) => {
 	}
 	const prodId = req.params.productId;
 	Product.findById(prodId)
-		.then((product) => {
+		.then(product => {
 			if (!product) {
 				return res.redirect('/');
 			}
@@ -59,7 +59,7 @@ exports.getEditProduct = (req, res, next) => {
 				product: product
 			});
 		})
-		.catch((err) => console.log(err));
+		.catch(err => console.log(err));
 };
 
 exports.postEditProduct = (req, res, next) => {
@@ -72,7 +72,7 @@ exports.postEditProduct = (req, res, next) => {
 	// Instead of creating a new object and overwriting the old product in the database, Mongoose allows us to very easily update an existing document.
 	// First, we find the product in the database using its ID.
 	Product.findById(prodId)
-		.then((product) => {
+		.then(product => {
 			// If we could not find the product, we redirect to the home page.
 			if (!product) {
 				return res.redirect('/');
@@ -84,12 +84,12 @@ exports.postEditProduct = (req, res, next) => {
 			product.price = updatedPrice;
 			return product.save();
 		})
-		.then((result) => {
+		.then(result => {
 			console.log('Updated Product!');
 			// The page redirection is placed inside the then() block to make sure the page renders with the new values. This does mean that we are not doing any redirection if an error occurs, but we will look at that in a future module of the course.
 			res.redirect('/admin/products');
 		})
-		.catch((err) => console.log(err));
+		.catch(err => console.log(err));
 };
 
 exports.getProducts = (req, res, next) => {
@@ -99,14 +99,14 @@ exports.getProducts = (req, res, next) => {
 		// The populate method allows us to exploit mongoose's understanding of the relationship between models. By choosing which field to populate, mongoose will attempt to retrieve any data associated with that field. This example shows that by populating the userId associated with a product, we can populate the entire user data within the product.
 		// The second argument is simply a select method for the populating data.
 		// .populate('userId', 'name')
-		.then((products) => {
+		.then(products => {
 			res.render('admin/products', {
 				prods: products,
 				pageTitle: 'Admin Products',
 				path: '/admin/products'
 			});
 		})
-		.catch((err) => {
+		.catch(err => {
 			console.log(err);
 		});
 };
@@ -119,5 +119,5 @@ exports.postDeleteProduct = (req, res, next) => {
 			console.log('Deleted Product!');
 			res.redirect('/admin/products');
 		})
-		.catch((err) => console.log(err));
+		.catch(err => console.log(err));
 };

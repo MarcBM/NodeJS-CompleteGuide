@@ -25,14 +25,14 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use((req, res, next) => {
 	// We can find the user here since we know that there will always be a user once a request comes into the server.
 	User.findById('651e8341a9a7b8901aed0451')
-		.then((user) => {
+		.then(user => {
 			// By adding the user to the request object, we can access the user at any point in the app. We are able to do this since 'user' is not a pre-defined field of the request object.
 			// We can once again simply add the object that mongoose returns, since it is a fully fledged object that we can interact with.
 			req.user = user;
 			// Don't forget to call the next middleware function!
 			next();
 		})
-		.catch((err) => console.log(err));
+		.catch(err => console.log(err));
 });
 
 app.use('/admin', adminRoutes);
@@ -45,9 +45,9 @@ const dbURL = fs.readFileSync('dbURL.txt', 'utf8').toString();
 // Using Mongoose, we don't need to worry about all the connection logic, it is handled for us.
 mongoose
 	.connect(dbURL)
-	.then((result) => {
+	.then(result => {
 		// Here we are creating a new user if there is no user in the system yet. FindOne() will return the first document that matches the query, and if there is no query, it will just return the first document in the database.
-		User.findOne().then((user) => {
+		User.findOne().then(user => {
 			if (!user) {
 				const user = new User({
 					name: 'Marc',
@@ -60,4 +60,4 @@ mongoose
 		console.log('Connected to MongoDB, courtesy of Mongoose!');
 		app.listen(3000);
 	})
-	.catch((err) => console.log(err));
+	.catch(err => console.log(err));

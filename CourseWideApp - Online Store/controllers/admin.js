@@ -5,7 +5,8 @@ exports.getAddProduct = (req, res, next) => {
 	res.render('admin/edit-product', {
 		pageTitle: 'Add Product',
 		path: '/admin/add-product',
-		editing: false
+		editing: false,
+		isAuthenticated: req.session.isLoggedIn
 	});
 };
 
@@ -24,7 +25,7 @@ exports.postAddProduct = (req, res, next) => {
 		price: price,
 		// Since we have full access to a mongoose object of the logged in user, we just need to pass in the id to the product constructor.
 		// A cool aside: you could simply pass in the entire user to this field and mongoose would take care to extract the id from the user object for us.
-		userId: req.user._id
+		userId: req.session.user._id
 	});
 	// With MongoDB, we defined our own methods with which to work with our models. With Mongoose, many methods come pre-defined for us, just by using the mongoose.model() method.
 	//
@@ -56,7 +57,8 @@ exports.getEditProduct = (req, res, next) => {
 				pageTitle: 'Edit Product',
 				path: '/admin/edit-product',
 				editing: editMode,
-				product: product
+				product: product,
+				isAuthenticated: req.session.isLoggedIn
 			});
 		})
 		.catch(err => console.log(err));
@@ -103,7 +105,8 @@ exports.getProducts = (req, res, next) => {
 			res.render('admin/products', {
 				prods: products,
 				pageTitle: 'Admin Products',
-				path: '/admin/products'
+				path: '/admin/products',
+				isAuthenticated: req.session.isLoggedIn
 			});
 		})
 		.catch(err => {

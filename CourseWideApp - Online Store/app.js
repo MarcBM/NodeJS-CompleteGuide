@@ -4,32 +4,58 @@ const fs = require('fs');
 // Node-Specific Modules
 const express = require('express');
 const bodyParser = require('body-parser');
+const session = require('express-session');
 // Custom Routes Modules
 const adminRoutes = require('./routes/admin');
 const shopRoutes = require('./routes/shop');
+const authRoutes = require('./routes/auth');
 // Custom Controller Modules
 const errorController = require('./controllers/error');
 // Custom Database Module
 const mongoose = require('mongoose');
+const MongoDBStore = require('connect-mongodb-session')(session);
+// Custom Data Models
 const User = require('./models/user');
 
+// We need to pass the url of the database in here. For more security, this is stored in a txt file stored only locally. To migrate this project properly, make sure this txt file exists in the same folder as app.js.
+const dbURI = fs.readFileSync('dbURI.txt', 'utf8').toString();
+
 const app = express();
+// Here we are configuring our session storage system. We are linking the session package to our MongoDB database, and defining the sessions collection.
+const store = new MongoDBStore({
+	uri: dbURI,
+	collection: 'sessions'
+});
 
 app.set('view engine', 'ejs');
 app.set('views', 'views');
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, 'public')));
+// We are registering middleware here to be able to manage 'sessions'.
+// Sessions are stored on the server side, and can be used to keep track of particular information across requests, such as authentication. They are much more secure than cookies, because they are stored on the server side, only accessed through a hashed id on a cookie from the client.
+// All the basic options are included here, and should be used every time. You can also configure options about the session cookie, such as the expiration time, etc.
+app.use(
+	session({
+		// This option is used to set up the hashing. It should ideally be a long string.
+		secret: 'this is a long string',
+		// This stops the session from being saved every single request.
+		resave: false,
+		// This stops the session from being saved when the user refreshes the page.
+		saveUninitialized: false,
+		// This tells the middleware how to store the sessions in the database, as opposed to in memory.
+		store: store
+	})
+);
 
-// We are registering another middleware function that will allow us to access our user at any point in the app.
+// Since we have now stored the user in the session object, we aren't getting anything more than data back from our calls. To fix this, we need to reassign the req.user field, by using the data found in the session object.
 app.use((req, res, next) => {
-	// We can find the user here since we know that there will always be a user once a request comes into the server.
-	User.findById('651e8341a9a7b8901aed0451')
+	if (!req.session.user) {
+		return next();
+	}
+	User.findById(req.session.user._id)
 		.then(user => {
-			// By adding the user to the request object, we can access the user at any point in the app. We are able to do this since 'user' is not a pre-defined field of the request object.
-			// We can once again simply add the object that mongoose returns, since it is a fully fledged object that we can interact with.
 			req.user = user;
-			// Don't forget to call the next middleware function!
 			next();
 		})
 		.catch(err => console.log(err));
@@ -37,14 +63,13 @@ app.use((req, res, next) => {
 
 app.use('/admin', adminRoutes);
 app.use(shopRoutes);
+app.use(authRoutes);
 
 app.use(errorController.get404);
 
-// We need to pass the url of the database in here. For more security, this is stored in a txt file stored only locally. To migrate this project properly, make sure this txt file exists in the same folder as app.js.
-const dbURL = fs.readFileSync('dbURL.txt', 'utf8').toString();
 // Using Mongoose, we don't need to worry about all the connection logic, it is handled for us.
 mongoose
-	.connect(dbURL)
+	.connect(dbURI)
 	.then(result => {
 		// Here we are creating a new user if there is no user in the system yet. FindOne() will return the first document that matches the query, and if there is no query, it will just return the first document in the database.
 		User.findOne().then(user => {

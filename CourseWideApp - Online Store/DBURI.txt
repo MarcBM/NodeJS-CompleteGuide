@@ -1,0 +1,1 @@
+mongodb+srv://marcbetbeder:k5QfYL8s8UnKlZvs@cluster0.9h8qw14.mongodb.net/shop?retryWrites=true&w=majority

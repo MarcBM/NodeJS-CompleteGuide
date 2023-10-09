@@ -1,4 +1,3 @@
-// NOTE: See the product model for more information on uncommented procedures here.
 const mongoose = require('mongoose');
 
 const Schema = mongoose.Schema;
@@ -12,7 +11,6 @@ const userSchema = new Schema({
 		type: String,
 		required: true
 	},
-	// Here we are defining a field that houses an array of embedded documents.
 	cart: {
 		items: [
 			{
@@ -27,9 +25,7 @@ const userSchema = new Schema({
 	}
 });
 
-// Mongoose does allow us to define our own custom methods in case we need some data logic that isn't handled natively. This is great because it is preferable to have all our data logic stored on the model itself rather than in other places throughout the application.
 userSchema.methods.addToCart = function (product) {
-	// As before, we can access the current product's index by looking through the current user's cart array. If it's not there, we get -1.
 	const cartProductIndex = this.cart.items.findIndex(cp => {
 		return cp.productId.toString() === product._id.toString();
 	});

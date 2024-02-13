@@ -61,16 +61,6 @@ app.use(errorController.get404);
 mongoose
 	.connect(dbURI)
 	.then(result => {
-		User.findOne().then(user => {
-			if (!user) {
-				const user = new User({
-					name: 'Marc',
-					email: 'marc.betbeder@hotmail.com',
-					cart: { items: [] }
-				});
-				user.save();
-			}
-		});
 		console.log('Connected to MongoDB, courtesy of Mongoose!');
 		app.listen(3000);
 	})

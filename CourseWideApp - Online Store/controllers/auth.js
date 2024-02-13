@@ -38,7 +38,9 @@ exports.postLogin = (req, res, next) => {
 						req.session.isLoggedIn = true;
 						req.session.user = user;
 						return req.session.save(err => {
-							console.log(err);
+							if (err) {
+								console.log('Login Error: ' + err);
+							}
 							res.redirect('/');
 						});
 					}
@@ -87,7 +89,9 @@ exports.postSignup = (req, res, next) => {
 
 exports.postLogout = (req, res, next) => {
 	req.session.destroy(err => {
-		console.log(err);
+		if (err) {
+			console.log('Logout Error: ' + err);
+		}
 		res.redirect('/');
 	});
 };

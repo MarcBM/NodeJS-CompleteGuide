@@ -3,16 +3,32 @@ const bcrypt = require('bcryptjs');
 const User = require('../models/user');
 
 exports.getLogin = (req, res, next) => {
+	// To access our flash message, we simply call the flash method, only providing the key. This will remove the message from the session.
+	// The flash method will return an empty array, not null, if no flash messages exist with the given key, so here we do some simple logic to extract our actual message.
+	let message = req.flash('error');
+	if (message.length > 0) {
+		message = message[0];
+	} else {
+		message = null;
+	}
 	res.render('auth/login', {
 		path: '/login',
-		pageTitle: 'Login'
+		pageTitle: 'Login',
+		errorMessage: message
 	});
 };
 
 exports.getSignup = (req, res, next) => {
+	let message = req.flash('error');
+	if (message.length > 0) {
+		message = message[0];
+	} else {
+		message = null;
+	}
 	res.render('auth/signup', {
 		path: '/signup',
-		pageTitle: 'Signup'
+		pageTitle: 'Signup',
+		errorMessage: message
 	});
 };
 
@@ -24,6 +40,9 @@ exports.postLogin = (req, res, next) => {
 		.then(user => {
 			if (!user) {
 				// If no such user exists based on the email provided, we return to the login page. We should post an error to the user here telling them why they didn't manage to log in.
+				// To do this, we are going to "flash" a message onto the session to be displayed on the Login Screen as an error. This means we are adding a message to the session that will be removed after being shown to the user.
+				// The flash() method takes a key and a value. The key is the type of message we are adding. The value is the message itself.
+				req.flash('error', 'Invalid email or password.');
 				return res.redirect('/login');
 			}
 			// If we made it passed here, we know the email exists, but we still need to check the password.
@@ -42,6 +61,7 @@ exports.postLogin = (req, res, next) => {
 							res.redirect('/');
 						});
 					}
+					req.flash('error', 'Invalid email or password.');
 					res.redirect('/login');
 				})
 				.catch(err => {
@@ -64,6 +84,10 @@ exports.postSignup = (req, res, next) => {
 		.then(userDoc => {
 			if (userDoc) {
 				// If the user exists, we are redirecting back to the sign-up page. We should post an error to the user here telling them why they didn't manage to sign-up.
+				req.flash(
+					'error',
+					'E-Mail exists already, please pick a different one.'
+				);
 				return res.redirect('/signup');
 			}
 			return bcrypt

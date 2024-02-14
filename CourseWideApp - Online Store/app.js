@@ -16,6 +16,8 @@ const mongoose = require('mongoose');
 const MongoDBStore = require('connect-mongodb-session')(session);
 // Custom Security Modules
 const csrf = require('csurf');
+// Custom Error Handling Modules
+const flash = require('connect-flash');
 // Custom Data Models
 const User = require('./models/user');
 
@@ -45,6 +47,9 @@ app.use(
 );
 // After we initialise the session, we can add the CSRF protection to the middleware stack. This will add a token to every request that is sent to the server. This token is then checked against the token stored in the session. If the tokens do not match, the request is rejected.
 app.use(csrfProtection);
+
+// Here we are initialising our flash middleware. This will allow us to add messages to the session that will be displayed to the user. This is useful for adding error messages to the user. This must be initialised after the session middleware.
+app.use(flash());
 
 app.use((req, res, next) => {
 	if (!req.session.user) {

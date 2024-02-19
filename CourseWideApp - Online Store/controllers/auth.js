@@ -1,6 +1,18 @@
 const bcrypt = require('bcryptjs');
+const nodemailer = require('nodemailer');
 
 const User = require('../models/user');
+
+// A transporter is an object that will define the connection to the mail server.
+// These options are from the mailtrap email testing service. https://mailtrap.io
+const transporter = nodemailer.createTransport({
+	host: 'sandbox.smtp.mailtrap.io',
+	port: 2525,
+	auth: {
+		user: '5abf07a40be149',
+		pass: '969ea048dca215'
+	}
+});
 
 exports.getLogin = (req, res, next) => {
 	let message = req.flash('error');
@@ -88,7 +100,17 @@ exports.postSignup = (req, res, next) => {
 					return user.save();
 				})
 				.then(result => {
+					// Here we don't need to wait for the email to be sent before we redirect the user, so we do that immediately, even though the email sending process is still running in the background.
 					res.redirect('/login');
+					return transporter.sendMail({
+						to: email,
+						from: 'vuldyn@lotroforge.com',
+						subject: 'Signup Succeeded!',
+						html: '<h1>You successfully signed up!</h1>'
+					});
+				})
+				.catch(err => {
+					console.log(err);
 				});
 		})
 		.catch(err => {
